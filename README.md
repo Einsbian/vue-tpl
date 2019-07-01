@@ -150,7 +150,7 @@ yarn run test:unit
   ```JavaScript
   // dic
   BillList/
-    index.vue # 唯一例外
+    Index.vue # 唯一例外
     Item.vue
     ...
 
