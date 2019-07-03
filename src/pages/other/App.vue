@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
+  <body id="app">
     <div id="nav">
-      <router-link to="/">
+      <RouterLink to="/">
         Home
-      </router-link> |
-      <router-link to="/about">
+      </RouterLink>|
+      <RouterLink to="/about">
         About
-      </router-link>
+      </RouterLink>
     </div>
-    <router-view />
-  </div>
+    <RouterView />
+  </body>
 </template>
 
 <style lang="scss">
@@ -30,4 +30,6 @@
     }
   }
 }
+
+@import '@/scss/reset.scss';
 </style>

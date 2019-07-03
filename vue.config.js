@@ -3,7 +3,7 @@
  * @Author: 毛瑞
  * @Date: 2019-06-18 16:18:18
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-06-28 14:25:24
+ * @LastEditTime: 2019-07-02 09:56:40
  */
 // TODO: 环境变量/入口文件 改变热更新
 const path = require('path')
@@ -11,25 +11,21 @@ const path = require('path')
 const environment = process.env // 环境变量
 const isProd = environment.NODE_ENV === 'production' // 是否生产环境
 
+const pages = require('./getPages')(isProd) // 自动检测并返回页面入口设置
 const chainWebpack = require(isProd
   ? './production.config' // 生产环境配置
   : './development.config') // 开发环境配置
 
-const pages = require('./getPages')(isProd) // 自动检测并返回页面入口设置
-/** 得到字符串唯一缩写
- * main => A, dm => W
- * user => T, du => b
- * show => V, ds => Z, pc => Y
- */
-const short = require('./shortString')() // 闭包
+const short = require('./shortString')() // 闭包 得到字符串唯一缩写
 
 /// 【配置项】 ///
-// https://cli.vuejs.org/config/#vue-config-js
+// https://cli.vuejs.org/zh/config
 module.exports = {
   /// 普通 ///
   publicPath: './', // 基础路径（当前脚本所在目录）（用于找图片等）
   lintOnSave: !isProd, // 保存时检查代码
   productionSourceMap: false, // 生产环境不要sourceMap
+  transpileDependencies: ['vuex-module-decorators'], // 转码
 
   /// 【配置样式选项】 ///
   css: {
@@ -52,6 +48,38 @@ module.exports = {
 
   /// 【配置页面入口】https://cli.vuejs.org/zh/config/#pages ///
   pages,
+
+  /// 【开发服务器配置】 ///
+  devServer: {
+    // lint
+    overlay: {
+      warnings: true,
+      errors: true,
+    },
+    port: environment.DEV_SERVER_PORT,
+    host: environment.DEV_SERVER_HOST,
+    proxy: (() => {
+      const REG_PROXY = /^BASE_URL(\d*)$/
+      const TARGET = 'PROXY_TARGET'
+
+      let proxyList = {}
+
+      let tmp
+      for (let key in environment) {
+        tmp = REG_PROXY.exec(key)
+        if (tmp) {
+          key = environment[key]
+          proxyList[key] = {
+            target: environment[TARGET + tmp[1]],
+            changeOrigin: true,
+            pathRewrite: path => path.replace(new RegExp(`^/${key}/`), '/'),
+          }
+        }
+      }
+
+      return proxyList
+    })(),
+  },
 
   /// 【webpack配置】 ///
   // https://github.com/neutrinojs/webpack-chain#getting-started
@@ -106,7 +134,7 @@ module.exports = {
       maxAsyncRequests: 6, // 最大异步代码请求数【浏览器并发请求数】
       maxInitialRequests: 3, // 最大初始化时异步代码请求数
 
-      // automaticNameDelimiter: '.', // 超过大小,分包时文件名分隔符
+      automaticNameDelimiter: '.', // 超过大小,分包时文件名分隔符
       name:
         !isProd ||
         // 生产环境缩写 vendors.main.show.user.77d.js => v.HTY.05b.js
@@ -130,37 +158,40 @@ module.exports = {
       cacheGroups: {
         /// css ///
         // 提取各入口的 css 到单独文件(还抽了一个空数组的 [entryName].*.*.js 出来???)
-        ...(() => {
-          /** 获取入口模块名
-           * @param {Object} module webpack module 对象
-           *
-           * @returns {String} 模块名
-           */
-          const recursiveIssuer = module => {
-            if (module.issuer) {
-              return recursiveIssuer(module.issuer)
-            } else if (module.name) {
-              return module.name
-            } else {
-              return ''
-            }
-          }
+        // ...(() => {
+        //   /** 获取模块是否是指定入口的
+        //    * @param {Object} module webpack module 对象
+        //    * @param {String} name 入口名
+        //    *
+        //    * @returns {Boolean}
+        //    */
+        //   const isBelong = (module, name) =>
+        //     module.name === name ||
+        //     (!!module.issuer && isBelong(module.issuer, name))
 
-          let css = {}
-          for (let entryName in pages) {
-            css[entryName] = {
-              name: entryName,
-              chunks: 'all',
-              enforce: true,
-              priority: 666666,
-              test: module =>
-                module.constructor.name === 'CssModule' &&
-                recursiveIssuer(module) === entryName,
-            }
-          }
+        //   const TYPE = 'css/mini-extract'
 
-          return css
-        })(),
+        //   let css = {}
+        //   let chunkName
+        //   for (let entryName in pages) {
+        //     chunkName = entryName + '.c' // 多页时与入口名重了要报错
+
+        //     css[chunkName] = {
+        //       name: chunkName,
+        //       chunks: 'all',
+        //       enforce: true,
+        //       priority: 666666,
+        //       // https://github.com/webpack-contrib/mini-css-extract-plugin
+        //       // test: module =>
+        //       //   module.constructor.name === 'CssModule' &&
+        //       //   isBelong(module, entryName),
+        //       test: module =>
+        //         module.type === TYPE && isBelong(module, entryName),
+        //     }
+        //   }
+
+        //   return css
+        // })(),
         /// js ///
         // configs
         conf: {
@@ -170,15 +201,7 @@ module.exports = {
           priority: 666666,
           test: /[\\/]config[\\/]/,
         },
-        // // jquery
-        // jq: {
-        //   name: 'jq',
-        //   chunks: 'all',
-        //   enforce: true,
-        //   priority: 666666,
-        //   test: /[\\/]node_modules[\\/]jquery[\\/]/,
-        // },
-        // // elementUI (建议按需加载)
+        // // elementUI (建议按需引入)
         // eui: {
         //   name: 'eui',
         //   chunks: 'all',
@@ -221,7 +244,7 @@ module.exports = {
         // // 所有其他依赖的模块
         // dll: {
         //   name: 'dll',
-        //   chunks: 'all',
+        //   chunks: 'initial',
         //   priority: 66,
         //   minChunks: 3,
         //   reuseExistingChunk: true,
@@ -247,32 +270,5 @@ module.exports = {
 
     /// 【不同环境配置】 ///
     chainWebpack(config)
-  },
-
-  /// 【开发服务器配置】 ///
-  devServer: {
-    host: environment.DEV_SERVER_HOST,
-    port: environment.DEV_SERVER_PORT,
-    proxy: (() => {
-      const REG_PROXY = /^BASE_URL(\d*)$/
-      const TARGET = 'PROXY_TARGET'
-
-      let proxyList = {}
-
-      let tmp
-      for (let key in environment) {
-        tmp = REG_PROXY.exec(key)
-        if (tmp) {
-          key = environment[key]
-          proxyList[key] = {
-            target: environment[TARGET + tmp[1]],
-            changeOrigin: true,
-            pathRewrite: path => path.replace(new RegExp(`^/${key}/`), '/'),
-          }
-        }
-      }
-
-      return proxyList
-    })(),
   },
 }

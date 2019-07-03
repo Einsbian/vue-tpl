@@ -1,0 +1,41 @@
+/*
+ * @Description: 浏览器样式重置
+ * @Author: 毛瑞
+ * @Date: 2019-07-01 14:01:23
+ * @LastEditors: 毛瑞
+ * @LastEditTime: 2019-07-02 11:30:24
+ */
+
+// placeholder 样式
+// input,
+// textarea {
+//   -webkit-appearance: none;
+
+//   // 得分开写 不然无效
+//   &::placeholder {
+//     color: $fontColor;
+//   }
+
+//   // WebKit
+//   &::-webkit-input-placeholder {
+//     color: $fontColor;
+//   }
+
+//   // Firefox 19+
+//   &::-moz-placeholder {
+//     color: $fontColor;
+//   }
+
+//   // Firefox 4 - 18
+//   &:-moz-placeholder {
+//     color: $fontColor;
+//   }
+
+//   // IE 10+
+//   &:-ms-input-placeholder {
+//     color: $fontColor;
+//   }
+// }
+
+@import '~normalize.css/normalize'; // 浏览器样式重置
+@import 'scroll.scss'; // 滚动条样式
