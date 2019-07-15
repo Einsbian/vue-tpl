@@ -3,31 +3,10 @@
  * @Author: 毛瑞
  * @Date: 2019-07-02 16:50:15
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-03 11:31:32
+ * @LastEditTime: 2019-07-11 17:28:57
  */
 import { IObject } from '@/types'
-
-const REG_C2K = /[A-Z]/g
-const REPLACE_C2K = (match: string): string => '-' + match.toLowerCase()
-/** camelCase 转 kebab-case，如: camelCase -> camel-case
- * @param {String} str
- *
- * @returns {String}
- */
-function camelToKebab(str: string): string {
-  return str.replace(REG_C2K, REPLACE_C2K)
-}
-
-const REG_K2C = /-[a-z]/g // 就不分组了
-const REPLACE_K2C = (match: string): string => match[1].toUpperCase()
-/** kebab-case 转 camelCase 如: camel-case -> camelCase
- * @param {String} str
- *
- * @returns {String}
- */
-function kebabToCamel(str: string): string {
-  return str.replace(REG_K2C, REPLACE_K2C)
-}
+import { camelToKebab } from '@/utils'
 
 const PREV_STRING = ';\\s*'
 const TAIL_STRING = '\\s*:\\s*(.*?)\\s*;'
@@ -46,6 +25,8 @@ function getValue(style: string, name: string): string {
 }
 
 /** 获取指定属性的样式
+ * @test true
+ *
  * @param {String | IObject<string>} style 样式字符串
  * @param {String} name 样式名
  *
@@ -66,11 +47,19 @@ function getStyleByName(style: string | IObject<string>, name: string): string {
   return ''
 }
 
-const REG_STYLE = / *(.*?) *: *(.*?) *;/g // 提取样式正则 分组：key,value
-const REG_QUOT = /"+/g // 转义双引号
-const REG_COMMA = /,*$/ // 末尾逗号
+/** 提取样式正则 分组：key,value
+ */
+const REG_STYLE = / *(.*?) *: *(.*?) *;/g
+/** 双引号
+ */
+const REG_QUOT = /"+/g
+/** 末尾逗号
+ */
+const REG_COMMA = /,*$/
 /** css样式字符串转为对象/JSON
  *  (不处理key 'margin-top: 2px' -> {'margin-top': '2px'})
+ * @test true
+ *
  * @param {String} style 样式字符串
  * @param {Function | Boolean} filter Function: 过滤函数 Boolean: isjson
  *  返回[string, string]: 依次修改样式名和样式值
@@ -125,29 +114,28 @@ function styleToObject(
 
   /// RegExp.exec【更快】 ///
   let json: string = '{'
-  let result: string[] | null
   let temp: [string, string] | string | boolean | void
-  do {
-    result = REG_STYLE.exec(style)
-    if (result) {
-      if (filter) {
-        temp = filter(result[1], result[2], result[0])
-        if (temp) {
-          if (temp === true) {
-            continue
-          } else if (typeof temp === 'string') {
-            result[2] = temp
-          } else {
-            result[1] = temp[0]
-            result[2] = temp[1]
-          }
+  let result: string[] | null
+  // 不这么写不能得到下一次匹配...
+  // tslint:disable-next-line: no-conditional-assignment
+  while ((result = REG_STYLE.exec(style))) {
+    if (filter) {
+      temp = filter(result[1], result[2], result[0])
+      if (temp) {
+        if (temp === true) {
+          continue
+        } else if (typeof temp === 'string') {
+          result[2] = temp
+        } else {
+          result[1] = temp[0]
+          result[2] = temp[1]
         }
       }
-
-      // 首尾双引号直接去掉
-      json += `"${result[1]}":"${result[2].replace(REG_QUOT, '\\"')}",`
     }
-  } while (result)
+
+    // 首尾双引号直接去掉
+    json += `"${result[1]}":"${result[2].replace(REG_QUOT, '\\"')}",`
+  }
   json = json.replace(REG_COMMA, '}') // 去末尾,加}
 
   /// replace ///
@@ -166,8 +154,12 @@ function styleToObject(
   return isjson ? json : JSON.parse(json)
 }
 
-const NO_UNIT = ['z-index'] // 值没有单位的样式
+/** 值没有单位的样式
+ */
+const NO_UNIT = ['z-index']
 /** 样式对象还原为css样式（值为数字的默认单位px）
+ * @test true
+ *
  * @param {IObject<string>} styleObj 样式对象
  * @param {Function} filter 过滤函数
  *  返回[string, string]: 依次修改样式名和样式值
@@ -233,11 +225,9 @@ function objectToStyle(
       }
     }
 
-    if (Number(value) && !NO_UNIT.includes(key)) {
-      // Number('') === Number(' ') === 0
-      // 纯数字（除0）加上px单位
-      value += 'px'
-    }
+    // Number('') === Number(' ') === 0
+    // 纯数字（除0）加上px单位
+    Number(value) && !NO_UNIT.includes(key) && (value += 'px')
 
     css += `${key}:${value};`
   }
@@ -246,6 +236,8 @@ function objectToStyle(
 }
 
 /** 更新样式字符串
+ * @test true
+ *
  * @param {String|Object} current 当前样式
  * @param {String|Object} target 带更新样式
  * @param {Function} filter 过滤函数
@@ -304,11 +296,4 @@ function updateStyle(
   return objectToStyle(current) || ''
 }
 
-export {
-  camelToKebab,
-  kebabToCamel,
-  getStyleByName,
-  styleToObject,
-  objectToStyle,
-  updateStyle,
-}
+export { getStyleByName, styleToObject, objectToStyle, updateStyle }

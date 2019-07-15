@@ -3,26 +3,47 @@
  * @Author: 毛瑞
  * @Date: 2019-06-04 16:07:30
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-06-27 12:44:35
+ * @LastEditTime: 2019-07-11 23:41:04
  */
+import { IObject } from '@/types'
 
-// 存储池
-interface IPool {
-  k: any // 存储键
-  v: any // 存储值
-  c?: number // 使用计数
+interface IKeyVal {
+  /** 键
+   */
+  k: any
+  /** 值
+   */
+  v: any
 }
-/** 内存存储 key/value可以任意类型
+/** 存储池
  */
-export const Memory = class {
-  public pool: IPool[] // 存储池
-  protected max: number // 最大缓存数量，默认30
-  protected alive: number // 缓存存活时间
-  private out: IPool[] // timeout队列
+interface IPool extends IKeyVal {
+  /** 使用计数
+   */
+  c: number
+}
+
+/** 内存存储 key/value可以任意类型
+ * @test true
+ *
+ */
+class Memory {
+  /** 存储池
+   */
+  public pool: IPool[]
+  /** 最大缓存数量，默认30
+   */
+  protected max: number
+  /** 缓存存活时间 0为永久
+   */
+  protected alive: number
+  /** timeout队列
+   */
+  private out: IKeyVal[]
 
   /** 构造函数
    * @param {Number} max 最大缓存数量，默认30
-   * @param {Number} alive 缓存存活时间
+   * @param {Number} alive 缓存存活时间 0为永久
    *
    * @returns {Object} Memory实例
    */
@@ -30,8 +51,8 @@ export const Memory = class {
     this.max = max
     this.alive = alive
 
-    this.pool = [] // 存储池
-    this.out = [] // timeout队列
+    this.pool = []
+    this.out = []
   }
 
   /** 获取值
@@ -40,16 +61,18 @@ export const Memory = class {
    * 0 返回{key, val}
    * 1 移除该key, 返回val
    * 其它 返回val (计引用次数)【默认】
-   * @param {Array} arr 存储池
+   * @param {Array} pool 存储池
    *
    * @returns {Any} 见option
    */
-  public get(key: any, option?: number, arr?: IPool[]): any {
-    arr || (arr = this.pool)
+  public get(key: any, option?: number, pool?: IPool[] | IKeyVal[]): any {
+    pool || (pool = this.pool)
 
     // 从后往前找
-    for (let tmp: IPool, idx: number = arr.length - 1; idx > -1; idx--) {
-      tmp = arr[idx]
+    let tmp: IPool | IKeyVal
+    let index: number = pool.length
+    while (index--) {
+      tmp = pool[index]
 
       if (tmp.k === key) {
         // 找到缓存
@@ -57,10 +80,10 @@ export const Memory = class {
           case 0: // 获取kv
             return tmp
           case 1: // 移除
-            arr.splice(idx, 1)
+            pool.splice(index, 1)
             break
           default:
-            tmp.c === undefined || tmp.c++ // 计数
+            (tmp as IPool).c++ // 计数
         }
 
         return tmp.v // 返回值
@@ -76,7 +99,7 @@ export const Memory = class {
    * @returns {Any} val 存储值
    */
   public set(key: any, value: any, expires?: number): any {
-    expires = expires || this.alive // 缓存存活时间
+    expires === undefined && (expires = this.alive)
     clearTimeout(this.get(key, 1, this.out)) // 先清除该key的timeout
 
     const tmp: any = this.get(key, 0) // 获取{key, val}
@@ -113,47 +136,60 @@ export const Memory = class {
    */
   public clear(): void {
     // 清空timeout队列
-    let item: IPool
+    let item: IKeyVal
     for (item of this.out) {
       clearTimeout(item.v)
     }
+
     this.out = []
     this.pool = []
   }
 
-  // 去掉超出限制数量且使用次数最低的
+  // 去掉使用次数最低的
   private elim(): void {
     const pool: IPool[] = this.pool
 
-    let idx: number = 0 // 待移除项下标
+    let index: number = 0 // 待移除项下标
     let item: IPool = pool[0] // 待移除项
-    // 从前往后找
-    const LEN: number = Math.ceil(pool.length / 2) // 只从前一半里找
-    for (let i: number = 1, count: number = Infinity; i < LEN; i++) {
-      item = pool[i]
 
-      if (item.c !== undefined && item.c < count) {
-        // 找到使用次数最少的
+    // 只从前一半里找
+    for (
+      let i: number = 1, LEN: number = pool.length / 2, count: number = item.c;
+      i < LEN;
+      i++
+    ) {
+      if (!count) {
+        // 使用次数为0(没有get过)
+        break
+      }
+
+      if (pool[i].c < count) {
+        // 记录使用次数更少的
+        index = i
+        item = pool[i]
         count = item.c
-        idx = i
-
-        if (!count) {
-          // 使用次数为0(没有get过)
-          break
-        }
       }
     }
 
-    pool.splice(idx, 1) // 移除该项
+    pool.splice(index, 1) // 移除该项
     clearTimeout(this.get(item.k, 1, this.out)) // 同时移除timeout
   }
 }
 
-// 本地存储 (单例 localStorage)
-const STORAGE: Storage = window.localStorage // 本地存储
-const REG_TIMESPAN: RegExp = /^(\d+)(.*)$/ // 提取时间戳
-const timeoutDic: Map<string, number> = new Map() // timeout字典(直接用{}啊...)
-export const local = {
+/** 本地存储
+ */
+const STORAGE: Storage = window.localStorage
+/** 提取时间戳
+ */
+const REG_TIMESPAN: RegExp = /^(\d+)(.*)$/
+/** timeout字典
+ */
+let timeoutDic: IObject<number> = {}
+/** 本地存储 (localStorage 单例)
+ * @test true
+ *
+ */
+const local = {
   /** 获取值
    * @param {String} key 存储键
    *
@@ -168,7 +204,7 @@ export const local = {
       if (execArray) {
         if (Date.now() > parseInt(execArray[1])) {
           // 过期
-          STORAGE.removeItem(key) // 移除
+          STORAGE.removeItem(key)
           return
         }
 
@@ -198,12 +234,10 @@ export const local = {
       throw e
     }
 
-    clearTimeout(timeoutDic.get(key)) // 先清除该key的timeout
-    // 设置过期时间
+    clearTimeout(timeoutDic[key]) // 先清除该key的timeout
     if (expires) {
-      timeoutDic.set(key, setTimeout(() => this.remove(key), expires))
-      // 加时间戳
-      str = Date.now() + expires + str
+      str = Date.now() + expires + str // 加时间戳
+      timeoutDic[key] = setTimeout(() => this.remove(key), expires)
     }
 
     STORAGE.setItem(key, str) // 存储
@@ -217,24 +251,26 @@ export const local = {
    */
   remove(key: string): object | undefined {
     // 同时移除timeout
-    clearTimeout(timeoutDic.get(key))
-    timeoutDic.delete(key)
+    clearTimeout(timeoutDic[key])
+    delete timeoutDic[key]
 
-    const val: object | undefined = this.get(key) // 获取值
-    STORAGE.removeItem(key) // 移除存储（无论成败，返回undefined）
+    const value: object | undefined = this.get(key) // 获取值
+    STORAGE.removeItem(key) // 移除存储
 
-    return val
+    return value
   },
   /** 清空存储
    */
   clear(): void {
     // 清空timeout
-    let timeoutId: number
-    for (timeoutId of timeoutDic.values()) {
-      clearTimeout(timeoutId)
+    let key: string
+    for (key in timeoutDic) {
+      clearTimeout(timeoutDic[key])
     }
 
-    timeoutDic.clear()
+    timeoutDic = {}
     STORAGE.clear()
   },
 }
+
+export { IPool, Memory, local }

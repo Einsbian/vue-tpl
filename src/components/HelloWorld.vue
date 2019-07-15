@@ -131,12 +131,11 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
-export default class HelloWorld extends Vue {
+export default class extends Vue {
   @Prop() private msg!: string
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" module>
 .wrapper {
   h3 {
@@ -151,7 +150,7 @@ export default class HelloWorld extends Vue {
     margin: 0 10px;
   }
   a {
-    color: #42b983;
+    color: $colorHighlight;
   }
 }
 </style>

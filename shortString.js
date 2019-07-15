@@ -3,7 +3,7 @@
  * @Author: Maorey
  * @LastEditors: 毛瑞
  * @Date: 2019-03-04 09:42:36
- * @LastEditTime: 2019-07-01 12:18:31
+ * @LastEditTime: 2019-07-13 01:08:24
  */
 
 /** 缩写字符串为一个字母（52个）
@@ -17,21 +17,17 @@ function getChar(str, code = 0) {
   if (typeof str === 'number') {
     code += str
   } else {
-    // 累加字符串码值
-    let idx = str.length
-    while (idx--) {
-      code += idx + str.charCodeAt(idx)
+    let index = str.length
+    while (index--) {
+      code += index + str.charCodeAt(index)
     }
   }
 
-  // 使在 [65, 122] 区间
   do {
-    code = (code + 65) % 123 // 0 - 122
+    code = (code + 61) % 123
   } while (code < 65)
-  // 处理 [91, 96] 区间
-  if (code > 90 && code < 97) {
-    code += code < 94 ? -3 : 3
-  }
+
+  code > 90 && code < 97 && (code += code < 94 ? -3 : 3)
 
   return String.fromCharCode(code)
 }
@@ -50,25 +46,22 @@ function getChar(str, code = 0) {
 // }
 
 const TRIAL = 8 // 重名重试次数
-/** 获得唯一缩写（耗时线性增涨，特别是在3个字母(140,608个唯一值)及之后）
+/** 获得唯一缩写（耗时线性增涨，特别是在3个字母(140608个唯一值)及之后）
  * @param {Object} DIC 命名字典
  * @param {String} char 缩写
- *
- * str: 当前缩写
- * i: 调用次数
+ * @param {String} str: 当前缩写
+ * @param {Number} i: 调用次数
  *
  * @returns {String} 唯一缩写
  */
 function getUnique(DIC, char, str = '', i = 0) {
   const code = str + char // 当前缩写
   let unique = true // 是否唯一
-  // 查字典得唯一
+  // 查重
   for (let att in DIC) {
     if (DIC[att] === code) {
-      // 与已有命名重复
       unique = false
       if (++i > TRIAL) {
-        // 超过尝试次数仍没有唯一缩写则追加一个字母
         str += char
         i = 0
       }
@@ -84,15 +77,23 @@ function getUnique(DIC, char, str = '', i = 0) {
 }
 
 /** 获取唯一字符串缩写方法
- * @param {Object} DIC 命名字典，用于去重, 默认:{}
+ * @param {Object} DIC 命名字典，用于去重
  * 【优化】 按码值总和区间分成多个字典 暂无必要
+ * @param {Function} callback 获取到新的缩写时执行的回调
  *
  * @returns {String:name => String:shortName} 返回唯一字符串缩写的方法
  */
-module.exports = function(DIC = {}) {
+module.exports = function(DIC = {}, callback) {
   return name => {
     name = String(name)
 
-    return DIC[name] || (DIC[name] = getUnique(DIC, getChar(name)))
+    let abbreviation = DIC[name]
+
+    if (!abbreviation) {
+      abbreviation = DIC[name] = getUnique(DIC, getChar(name))
+      callback && callback(name, abbreviation)
+    }
+
+    return abbreviation
   }
 }

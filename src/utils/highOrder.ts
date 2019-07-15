@@ -3,13 +3,15 @@
  * @Author: 毛瑞
  * @Date: 2019-07-02 14:32:33
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-02 16:31:46
+ * @LastEditTime: 2019-07-11 12:31:04
  */
-import { CreateElement, Component, RenderContext } from 'vue'
+
 import CONFIG from '@/config'
 
-import loading from '@com/Loading' // 加载中
-import error from '@com/Error' // 加载失败
+import LOADING from '@com/Loading.vue' // 加载中
+import ERROR from '@com/Error.vue' // 加载失败
+
+import { CreateElement, Component, AsyncComponent, RenderContext } from 'vue'
 
 /** 组件字典
  */
@@ -44,16 +46,20 @@ function getChooser(
 }
 
 /** 获取带加载状态的【异步】组件
- * @param {Function} getter 异步组件获取方法, 比如: () => import('a.vue')
+ * @param {Function} promiseFactory 异步组件, 比如: () => import('a.vue')
  *    另: 第一次执行import方法就会开始下载chunk并返回Promise，成功后保存Promise下次直接返回
  *
  * @returns {Function} 带加载状态的异步组件
  */
-function getAsync(getter: () => Promise<any>) {
+function getAsync(
+  promiseFactory: () => Promise<Component | { default: Component }>,
+  loading: Component = LOADING,
+  error: Component = ERROR
+): AsyncComponent {
   return () => ({
     error, // 加载失败时
     loading, // 加载时
-    component: getter(), // 加载成功时(不能是工厂函数啊...)
+    component: promiseFactory() as any, // 加载成功时(不能是工厂函数了...)
 
     delay: 1, // 展示加载中延时(默认200)
     timeout: CONFIG.timeout, // 加载超时（默认Infinity）
@@ -64,7 +70,7 @@ function getAsync(getter: () => Promise<any>) {
 <template>
   <Transition name="fade">
     <KeepAlive>
-      <Chooser :is="is"/>
+      <Chooser :is="is" :type="type"/>
     </KeepAlive>
   </Transition>
 </template>
@@ -88,6 +94,9 @@ const Chooser = getChooser({
 @Component({ components: { Chooser } })
 export default class extends Vue {
   get is() {
+    return 'B'
+  }
+  get type() {
     return 'A'
   }
 }
@@ -103,7 +112,7 @@ export default class extends Vue {
 @Component({
   components: {
     // 按规范命名哈 (多个异步组件合并到一个chunk用一样的名字)
-    AsyncComponent: getAsync(() => import('A.vue')),
+    AsyncComponent: getAsync(/* webpackChunkName: "ocA" * / () => import('A.vue')),
   },
 })
 export default class extends Vue {}
@@ -121,8 +130,8 @@ export default class extends Vue {}
 
 <script lang="ts">
 const Chooser = getChooser({
-  A: getAsync(() => import('A.vue')),
-  B: getAsync(() => import('A.vue')),
+  A: getAsync(/* webpackChunkName: "oCom" * /() => import('A.vue')),
+  B: getAsync(/* webpackChunkName: "oCom" * / () => import('A.vue')),
 })
 
 @Component({ components: { Chooser } })
@@ -149,7 +158,7 @@ export default Chooser // 异步加载的时候必须是default
 <script lang="ts">
 @Component({
   components: {
-    AsyncComponent: getAsync(() => import('Chooser/index.ts')),
+    AsyncComponent: getAsync(/* webpackChunkName: "ocChooser" * / () => import('Chooser')),
   },
 })
 export default class extends Vue {
@@ -161,4 +170,4 @@ export default class extends Vue {
 */
 // 更多...
 
-export { filterByIS as filter, getChooser, getAsync }
+export { filterByIS as filter, getChooser, getAsync, IDictionary }

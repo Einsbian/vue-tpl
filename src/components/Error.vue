@@ -21,7 +21,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { load } from '@/config/message'
 
 @Component
-export default class Error extends Vue {
+export default class extends Vue {
   get text() {
     return load.fail
   }
@@ -36,9 +36,9 @@ export default class Error extends Vue {
 .error {
   width: 120px;
   height: 70px;
-  color: $fontColor;
+  color: $colorText;
   text-align: center;
-  @extend %pageCenter;
+  @extend %centerPage;
 
   // 图标
   i {
@@ -48,7 +48,7 @@ export default class Error extends Vue {
     font-size: $x-large;
     border-radius: 100%;
     display: inline-block;
-    border: 1px solid $fontColor;
+    border: 1px solid $colorText;
 
     // hack 位置修正
     &:before {

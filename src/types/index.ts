@@ -3,9 +3,11 @@
  * @Author: 毛瑞
  * @Date: 2019-07-02 17:01:30
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-02 17:02:34
+ * @LastEditTime: 2019-07-08 13:34:45
  */
 
-export interface IObject<T> {
+/** js对象
+ */
+export interface IObject<T = any> {
   [key: string]: T
 }

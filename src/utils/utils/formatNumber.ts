@@ -3,18 +3,30 @@
  * @Author: 毛瑞
  * @Date: 2019-06-27 13:05:04
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-06-27 18:26:25
+ * @LastEditTime: 2019-07-11 17:27:47
  */
 
+/** 单位设置
+ */
 interface INumberUnit {
-  len: number // 位数，比如千=3 万=4
-  unit?: string // 末尾单位文字
-  limit?: number // 位数超过该值才处理单位,比如:len=4,limit=5,unit=万 时:12345 => 12345;123456 => 12.3456万
+  /** 位数，比如千=3 万=4
+   */
+  len: number
+  /** 末尾单位文字
+   */
+  unit?: string
+  /** 位数超过该值才处理单位,比如:len=4,limit=5,unit=万 时:12345 => 12345;123456 => 12.3456万
+   */
+  limit?: number
 }
 
-const REG_NUMBER: RegExp = /(\d)(?=(?:\d{3})+$)/g // 数字三位
+/** 匹配后面有三个数字的数字
+ */
+const REG_NUMBER: RegExp = /(\d)(?=(\d{3})+$)/g
 
 /** 格式化数字 每三位数字增加个逗号 （小数点后的除外）
+ * @test true
+ *
  * @param {Number|String} num
  * @param {Number} digit Number:保留小数位数
  * @param {String|INumberUnit} unit String 单位 默认按万计算
@@ -26,9 +38,7 @@ function formatNumber(
   digit?: any,
   unit?: string | INumberUnit
 ): string {
-  if (!unit && typeof digit !== 'number') {
-    unit = digit
-  }
+  !unit && typeof digit !== 'number' && (unit = digit)
 
   const numSplit: string[] = String(num || 0).split('.')
   let decimal: string = numSplit[1] || '' // 小数部分
@@ -38,6 +48,7 @@ function formatNumber(
   if (typeof unit === 'object') {
     const len: number = num.length
     const limit: number = unit.limit || unit.len
+
     if (limit && len > limit) {
       const index: number = len - unit.len
       decimal = num.slice(index) + decimal

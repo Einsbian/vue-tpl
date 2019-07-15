@@ -3,32 +3,52 @@
  * @Author: 毛瑞
  * @Date: 2019-06-27 12:58:37
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-03 10:20:44
+ * @LastEditTime: 2019-07-11 17:25:53
  */
 
+import { IObject } from '@/types'
+
+/** 克隆过滤函数返回值
+ */
 interface IClone {
-  jump?: boolean // 不拷贝该属性
-  value?: any // 替换值
+  /** 不拷贝该属性
+   */
+  jump?: boolean
+  /** 替换值
+   */
+  value?: any
 }
 
-/** 深扩展一个对象/数组
- * @param {Array|Object} source 待扩展对象
- * @param {Array|Object} target 目标对象
+/** 自定义过滤函数
+ * @param {String} key 待拷贝属性
+ * @param {Any} targetValue 目标值
+ * @param {Any} currentValue 当前值
+ * @param {Object|Array} currentObject 当前对象
+ * @param {Object|Array} targetObject 目标对象
+ * @param {Number} deep 递归层级
  *
- * @returns {Array|Object} source 待扩展对象
+ * @returns {void|boolean|IClone}
+ */
+type Filter = (
+  key: string,
+  targetValue: any,
+  currentValue: any,
+  currentObject: IObject | any[],
+  targetObject: IObject | any[],
+  deep?: number
+) => void | boolean | IClone
+
+/** 深扩展一个对象/数组
+ * @param {Object|Array} source 待扩展对象
+ * @param {Object|Array} target 目标对象
+ *
+ * @returns {Object|Array} source 待扩展对象
  */
 function extend(
-  source: any | any[],
-  target: any | any[],
-  deep?: number, // 递归层级
-  filter?: (
-    key: string, // 待拷贝属性
-    targetValue: any, // 目标值
-    currentValue: any, // 当前值
-    currentObject: any | any[], // 当前对象
-    targetObject: any | any[], // 目标对象
-    deep?: number // 递归层级
-  ) => undefined | false | IClone
+  source: IObject | any[] | any,
+  target: IObject | any[] | any,
+  filter?: Filter,
+  deep?: number
 ): any | any[] {
   let currentValue: any
   let targetValue: any
@@ -41,23 +61,19 @@ function extend(
 
     tmp = filter && filter(key, targetValue, currentValue, source, target, deep)
     if (tmp) {
-      if (!tmp.jump) {
-        source[key] = tmp.value // 自定义拷贝
-      }
+      tmp.jump || (source[key] = tmp.value) // 自定义拷贝
     } else if (!targetValue || typeof targetValue !== 'object') {
       source[key] = targetValue // 拷贝值
     } else {
       // 当前类型应与目标相同（数组/对象）
       tmp = Array.isArray(targetValue) // 目标是否数组
-      if (Array.isArray(currentValue) !== tmp) {
-        currentValue = 0 // 类型不同
-      }
+      Array.isArray(currentValue) === tmp || (currentValue = 0) // 类型不同
 
       source[key] = extend(
         currentValue || (tmp ? [] : {}),
         targetValue,
-        (deep || 0) + 1,
-        filter
+        filter,
+        (deep || 0) + 1
       )
     }
   }
@@ -65,22 +81,15 @@ function extend(
   return source
 }
 /** 深克隆/扩展 对象/数组(无其他原型和循环引用)
+ * @test true
+ *
  * @param {Function} filter 可选，自定义过滤
  * @param {...Rest} 待克隆/扩展的对象/数组列表 只有一个数组/对象时克隆，多个则后面的扩展到第一个对象上
  *
  * @returns {Array|Object} 克隆/扩展的后的对象
  */
 function clone(...args: any[]): any {
-  let filter:
-    | ((
-        key: string, // 待拷贝属性
-        valueValue: any, // 目标值
-        currentValue: any, // 当前值
-        currentObject: any[] | object, // 当前对象
-        targetObject: any[] | object, // 目标对象
-        deep?: number // 递归层级
-      ) => undefined | false | IClone)
-    | undefined
+  let filter: Filter | undefined
   typeof args[0] === 'function' && (filter = args.shift())
 
   let argsLength: number = args.length
@@ -115,7 +124,7 @@ function clone(...args: any[]): any {
     current = Array.isArray(target) ? [] : {}
   }
 
-  current && target && extend(current, target, 0, filter)
+  current && target && extend(current, target, filter, 0)
 
   if (!next) {
     // 没有下一项
