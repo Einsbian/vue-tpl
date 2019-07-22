@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "help": true,
     "pretty": true,
     "strict": true,
     "allowJs": true,
     "sourceMap": true,
     "jsx": "preserve",
+    "outDir": "build",
     "target": "esnext",
     "module": "esnext",
+    "diagnostics": true,
     "importHelpers": true,
     "esModuleInterop": true,
     "moduleResolution": "node",

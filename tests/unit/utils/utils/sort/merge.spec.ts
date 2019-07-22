@@ -1,13 +1,13 @@
 /*
- * @Description: 快速排序 测试
+ * @Description: 归并排序 测试
  * @Author: 毛瑞
- * @Date: 2019-06-27 17:41:06
+ * @Date: 2019-07-19 16:24:03
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-04 12:45:09
+ * @LastEditTime: 2019-07-19 20:57:06
  */
-import quickSort from '@/utils/utils/quickSort'
+import mergeSort from '@/utils/utils/sort/merge'
 
-test('quickSort', () => {
+test('mergeSort', () => {
   const testArray: number[] = []
 
   let arrayLength: number = 10000
@@ -18,23 +18,23 @@ test('quickSort', () => {
 
   let pass: boolean = true
 
-  quickSort(testArray)
+  mergeSort(testArray)
   for (let i: number = 0; i < arrayLength; i++) {
     if (testArray[i + 1] < testArray[i]) {
       pass = false
       break
     }
   }
-  expect(pass).toBe(true)
 
   if (pass) {
-    quickSort(testArray, (a: number, b: number): boolean => a < b)
+    mergeSort(testArray, (a: number, b: number): boolean => a < b)
     for (let i: number = 0; i < arrayLength; i++) {
       if (testArray[i + 1] > testArray[i]) {
         pass = false
         break
       }
     }
-    expect(pass).toBe(true)
   }
+
+  expect(pass).toBe(true)
 })
