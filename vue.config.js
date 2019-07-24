@@ -1,11 +1,12 @@
-/*
+/**
  * @Description: 脚手架(vue cli)配置入口
  * @Author: 毛瑞
  * @Date: 2019-06-18 16:18:18
  * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-22 11:02:10
+ * @LastEditTime: 2019-07-23 20:36:46
  */
 // TODO: 环境变量/入口文件 改变热更新
+const fs = require('fs')
 const path = require('path')
 
 const environment = process.env // 环境变量
@@ -64,10 +65,29 @@ module.exports = {
         // https://github.com/webpack-contrib/css-loader#localidentname
         // https://github.com/webpack/loader-utils#interpolatename
         localIdentName: isProd ? '[hash:5]' : '[folder]-[name]-[local][emoji]',
-        camelCase: 'only', // 驼峰化class名，不保留非驼峰class名
+        camelCase: 'only', // 只允许驼峰class名
+        // localsConvention: 'camelCaseOnly', // 只允许驼峰class名
       },
       sass: {
-        data: '@import "@/scss/var.scss";', // 全局引入
+        // 全局scss变量(入口覆盖全局)
+        data(loaderContext) {
+          // More information about avalaible options https://webpack.js.org/api/loaders/
+          let global = `@import "@${environment.GLOBAL_SCSS}";` // 项目全局
+
+          let temp
+          let key
+          for (key in pages) {
+            if (
+              loaderContext.resourcePath.includes((temp = pages[key].alias)) &&
+              fs.existsSync(path.join(temp, environment.GLOBAL_SCSS))
+            ) {
+              global += `@import "@${key + environment.GLOBAL_SCSS}";`
+              break
+            }
+          }
+
+          return global
+        },
       },
     },
   },
@@ -95,7 +115,8 @@ module.exports = {
           proxyList[key] = {
             target: environment[TARGET + tmp[1]],
             changeOrigin: true,
-            pathRewrite: url => url.replace(new RegExp(`^/${key}/`), '/'),
+            pathRewrite: url =>
+              url.replace(new RegExp(`^/${key}(/.*)?$`), '$1'),
           }
         }
       }
