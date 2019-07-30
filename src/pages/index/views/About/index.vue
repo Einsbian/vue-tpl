@@ -1,11 +1,11 @@
 <!--
- * @Description: 模块二
+ * @Description: About视图【仅布局】
  * @Author: 毛瑞
- * @Date: 2019-07-08 12:51:49
+ * @Date: 2019-07-25 10:19:56
  -->
 <template>
   <div :class="$style.wrapper">
-    这里是模二
+    这里是About视图
   </div>
 </template>
 
@@ -34,6 +34,11 @@ export default class extends Vue {
 
 <style lang="scss" module>
 .wrapper {
-  padding: 10px
+  padding: 10% 0;
+  margin-top: 30vh;
+  color: $colorText;
+  text-align: center;
+  font-size: $xx-large;
+  background: url(~@index/assets/bg-grid.png);
 }
 </style>

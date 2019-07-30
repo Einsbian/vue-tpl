@@ -2,20 +2,18 @@
  * @Description: 归并排序 测试
  * @Author: 毛瑞
  * @Date: 2019-07-19 16:24:03
- * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-19 20:57:06
  */
 import mergeSort from '@/utils/utils/sort/merge'
 
+const testArray: number[] = []
+
+let arrayLength: number = 10000
+while (arrayLength--) {
+  testArray.push(Math.random() * arrayLength)
+}
+arrayLength = testArray.length - 1
+
 test('mergeSort', () => {
-  const testArray: number[] = []
-
-  let arrayLength: number = 10000
-  while (arrayLength--) {
-    testArray.push(Math.random() * arrayLength)
-  }
-  arrayLength = testArray.length - 1
-
   let pass: boolean = true
 
   mergeSort(testArray)

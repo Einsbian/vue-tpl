@@ -2,6 +2,28 @@
 
 vue + vuex + vue router + TypeScript(或 JavaScript) 脚手架
 
+- [命令参考](#命令参考)
+  - [安装项目](#安装项目)
+    - [可选项](#可选项)
+  - [开发环境（开发调试时使用）](#开发环境开发调试时使用)
+  - [构建项目（生成部署文件）](#构建项目生成部署文件)
+  - [代码风格检查和修正（提交 Git 时会自动执行）](#代码风格检查和修正提交-git-时会自动执行)
+  - [e2e(end-to-end) 测试](#e2eend-to-end-测试)
+  - [单元测试](#单元测试)
+  - [命令帮助](#命令帮助)
+- [说明及注意事项](#说明及注意事项)
+  - [目录结构](#目录结构)
+  - [风格建议](#风格建议)
+  - [其他建议](#其他建议)
+  - [优化](#优化)
+  - [IDE](#ide)
+- [部署（nginx）](#部署nginx)
+- [备忘](#备忘)
+  - [文档](#文档)
+  - [问题及思考](#问题及思考)
+  - [笔记](#笔记)
+  - [其他](#其他)
+
 ## 命令参考
 
 以`yarn`为例（使用`npm`或`cnpm`替换`yarn`命令即可）:
@@ -143,6 +165,7 @@ yarn run test:unit
 
 - 新建目录时尽量复用上述列出的目录名，保证结构清晰的情况下减少目录层级
 - 目录及文件命名：<br>
+<<<<<<< HEAD
   文件夹及其它文件(js/scss/图片等)使用 `camelCase` (即：首字母小写驼峰 = lowerCamelCase)；<br>
   vue 单文件组件或其文件夹容器使用 `PascalCase` ( 即：首字母大写驼峰 = CamelCase = UpperCamelCase)<br>
 - 组件包含不可复用的子组件时，应视为一个组件创建文件夹容器，比如:
@@ -163,6 +186,44 @@ yarn run test:unit
 - 尽量**不要使用全局注册**(插件/组件/指令/混入等)以使代码更清晰、优化打包和维护
 - 组件尽量**按逻辑和呈现拆分**以更好的复用和维护
 - 不要从依赖库的源码引入 js/css 等，这将不会被转译，可以从其构建后 lib/dist 等目录引入需要的模块，尽量**按照其文档的描述**使用
+=======
+  **文件夹及其它文件**(js/scss/图片等)使用 `camelCase` (即：首字母小写驼峰 = lowerCamelCase)；<br>
+  **vue 单文件组件**(含[tsx](https://github.com/wonderful-panda/vue-tsx-support)/`jsx`/`functional.(ts|js)`)使用 `PascalCase` ( 即：首字母大写驼峰 = CamelCase = UpperCamelCase)<br><br>
+  例外情况:
+
+  - 组件包含不可复用的子组件时，应视为一个组件, 创建**文件夹容器**，比如:
+
+    ```TypeScript
+    // BillList组件
+    BillList
+    │── index.vue # 可以例外
+    │── Item.vue
+    └── ...
+
+    // 使用组件
+    import BillList from '{path}/BillList'
+    ```
+
+    或者
+
+    ```TypeScript
+    // BillList组件
+    BillList
+    │── index.tsx # 可以例外
+    │── Item.vue
+    └── ...
+
+    // 使用组件
+    import BillList from '{path}/BillList'
+    ```
+
+- 视图只负责布局及交互(props 传递和事件监听)，包含子组件的可使用**文件夹容器**方式或将子组件存放在对应层级的 `components` 目录下的同名目录(`camelCase`)下
+- 公共组件/逻辑/函数/样式等模块请按照: `模块 -> 视图 -> 页面 -> 项目` 的层级提升, 配合**提前规划**确定初始层级
+- 越高的层级测试覆盖率也应越高; 被测试的代码应加注释`@test: true`表示在对应目录下包含测试用例,否则指明路径; 修改了测试覆盖的代码后，应视情况增加测试内容并运行测试，以保证功能和行为与之前一致
+- 尽量**不要使用全局注册**(插件/组件/指令/混入等)以优化打包和使代码更清晰、易维护
+- 组件尽量**按逻辑和呈现拆分**以更好的复用和维护
+- 尽量**按照依赖库的文档描述**来使用她，从其源码(src)引入模块(css/scss/.../js/mjs/ts/jsx/tsx/vue)，将可能**不会被转译**且更可能随版本更新改变，需要时可以从其构建后的 lib/dist 等目录引入或者增加一些配置(需要了解模块解析及转码规则和相关插件，不推荐)
+>>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
 
 ### 风格建议
 
@@ -178,12 +239,65 @@ yarn run test:unit
 
 （.vscode 文件夹为 VSCode 的工作区设置，只在本项目生效，已包含 Prettier 插件相关风格设置）
 
+<<<<<<< HEAD
 > 另请参考: [vue 风格指南](https://cn.vuejs.org/v2/style-guide/) 强烈推荐(B)及以上和 TypeScript [tslint.json](https://palantir.github.io/tslint/rules/)
 
 > 提交代码请使用标识: Add/Del/Fix/Mod 等
 
 ### 其他建议
 
+=======
+- 另请参考: [vue 风格指南](https://cn.vuejs.org/v2/style-guide/) **推荐(C)及以上**和 TypeScript [tslint.json](https://palantir.github.io/tslint/rules/)
+- 在 jsx/tsx 中使用全局注册的组件时可以使用`kebab-case`, 否则会在控制台输出错误 ┐(：´ ゞ｀)┌
+
+  ```TypeScript
+  import { CreateElement } from 'vue'
+  import { Component, Vue } from 'vue-property-decorator'
+
+  @Component
+  export default class extends Vue {
+    private render(h: CreateElement) {
+
+      return (
+        <el-row>
+          <el-button>这是个按钮</el-button>
+        </el-row>
+      )
+    }
+  }
+  ```
+
+- 引用 vue 单文件组件不要加文件扩展名，有利于后期重构代码
+- 先定义再`export`(IDE 提示更友好), 并且`export`语句放到最后(方便查看代码)
+- **不要用全局样式覆盖全局样式**, 应使用 `CSSModule` 并使优先级相等(注意顺序，包括同步/异步)或更高:
+  ```scss
+  // bad →_→
+  :global {
+    .content .title.active {
+      color: $colorHighlight;
+    }
+  }
+  // good ｂ(￣▽￣)ｄ
+  .content {
+    :global {
+      .title.active {
+        color: $colorHighlight;
+      }
+    }
+  }
+  ```
+- 尽量使用项目代码模板，现有模板有(vsCode 输入左侧字符, [其他 IDE](.vscode/vue.code-snippets)):
+  - `ts`: `TypeScript` & `CSS Module`, vue 单文件组件中使用
+  - `vue`: `TypeScript` & `CSS Module`, `tsx` 文件中使用
+  - `js`: `JavaScript` & `CSS Module`, vue 单文件组件中使用
+  - `vue`: `JavaScript` & `CSS Module`, `jsx` 文件中使用
+- 提交代码请使用标识: Add/Del/Fix/Mod 等
+
+### 其他建议
+
+- 全局 sccs 中(见 .env 文件`GLOBAL_SCSS=/scss/var.scss`)不要出现具体样式, 也不要有[`:export{}`](https://github.com/css-modules/icss#export)
+
+>>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
 - 规范优雅正确适当的各种**注释**，比如方法注释及必要的变量注释：
 
   ```TypeScript
@@ -288,8 +402,13 @@ yarn run test:unit
 请参照 `vue.config.js`文件中*chainWebpack*的注释进行配置
 
 - 减小图片大小(比如背景图片等)
+<<<<<<< HEAD
 - 对多个 js chunk 共同依赖的模块进行单独提取
 - 视情况对 css 文件进行合并(比如按入口等，不设置则按 chunk)
+=======
+- 对多个 js chunk 共同依赖的模块进行单独提取(cacheGroups)
+- 视情况对 css 文件进行合并(比如按入口等，不设置则按 chunk)【webpack 5 支持设置 css chunk 的 minSize/maxSize 啦】
+>>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
 - [现代模式](https://cli.vuejs.org/zh/guide/browser-compatibility.html#现代模式)
 
 ### 日志
@@ -301,6 +420,7 @@ yarn run test:unit
 推荐使用： **Visual Studio Code** (VSCode)，推荐插件：
 
 - Vetur: vue 开发必备
+<<<<<<< HEAD
 - GitLens: Git 工具
 - ESLint/TSLint: 代码检查
 - Prettier - Code formatter: 代码格式化
@@ -308,6 +428,12 @@ yarn run test:unit
 - koroFileHeader: 文件头注释
 - Bracket Pair Colorizer: 彩虹色括号（()[]{}<>）
 - Debugger for Chrome: 在 VSCode 中远程调试 Chrome 上运行的网页
+=======
+- ESLint & TSLint: 代码检查
+- Prettier - Code formatter: 代码格式化
+- GitLens: Git 工具
+- EditorConfig for VS Code: IDE 设置
+>>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
 
 推荐工具： `@vue/cli`: v3.X，全局安装时可使用 `vue ui` 命令启动图形化界面管理项目(运行 inspect 任务查看 webpack 配置)[文档链接](https://cli.vuejs.org/zh/guide)
 
@@ -319,7 +445,7 @@ yarn run test:unit
 2. 反向代理，绕过同源策略限制（api/图片等资源跨域等）
 3. 添加请求头字段 `access_token` 使后台能读到该字段（nginx 的 http 或 server 节点下需要添加配置`underscores_in_headers on; # 允许带下划线的请求头`）
 4. 开启 `gzip` 压缩，并重用已有 gz 文件 `gzip_static on;`
-5. 缓存**除 html**之外其他静态资源
+5. 缓存静态资源(html 可减小缓存时间)
 
 配置示例:
 
@@ -382,6 +508,7 @@ server {
 
 ### 备忘
 
+<<<<<<< HEAD
 - 在 js 中使用 `assets` 目录下的图片可以通过 `require('@/assets/img/*.png')`, 将得到输出路径或 base64 字符串
 
 #### 问题及思考
@@ -389,3 +516,37 @@ server {
 - 关于异步组件
   > **css Module**: 要考虑样式的提取和加载顺序（异步组件按需加载，样式就可能覆盖现有的），后期无力排查处理时才修改 class 命名规避（比如加个随机 emoji 或其它命名方式使 class 名唯一，但是共同样式就不能抽取了）<br><br> **异步组件加载失败重试**: 暂时无解，因为各层级（RouterView functional 等）的组件分发，很难统一实现点击加载失败重试，最好还是 Vue 对异步组件提供支持[#9788](https://github.com/vuejs/vue/issues/9788)，比如可以通过增加指令、钩子、监听事件等选项并提供上下文去更改异步组件加载状态和重新加载等）。当然，异步 chunk ( import() )可以自己实现失败后重新加载（resolved 则记录 promise，下次 import 直接返回；rejected 则不记录，下次 import 重新请求）
 - 现代模式: (只针对 js 文件)该模式优点是若浏览器支持 ES2015 则加载 ES2015 代码(体积更小执行更快，&lt;script type="module"&gt; & &lt;link rel="modulepreload"&gt;)；不支持则加载 Babel 转码后的代码(&lt;script nomodule&gt; & &lt;link rel="preload"&gt;)。但是不知何故未能生效，github 上有一些相关 issue。
+=======
+#### 文档
+
+- [scss](https://www.sass.hk/docs)
+- [vue](https://cn.vuejs.org)
+- [vuex](https://vuex.vuejs.org)
+- [vue-router](https://router.vuejs.org)
+- [vuex-class](https://github.com/ktsn/vuex-class)
+- [vue-class-component](https://github.com/vuejs/vue-class-component)
+- [vuex-module-decorators](https://championswimmer.in/vuex-module-decorators/)
+- [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator)
+- [vue-i18n](http://kazupon.github.io/vue-i18n)
+- [element-ui](https://element.eleme.cn)
+- [axios](https://github.com/axios/axios)
+- [crypto-js](http://cryptojs.altervista.org)
+- [jsencrypt](http://travistidwell.com/jsencrypt)
+
+#### 问题及思考
+
+- **Vue 异步组件加载失败重试**: 暂时无解，因各层级（RouterView functional 等）的分发，很难统一实现加载失败后可点击重新下载，最好还是 Vue 对异步组件提供支持[#9788](https://github.com/vuejs/vue/issues/9788)
+- 现代模式(只针对 js 文件): 该模式优点是若浏览器支持 ES2015 则加载 ES2015 代码(体积更小执行更快，`<script type="module">` & `<link rel="modulepreload">`)；不支持则加载 Babel 转码后的代码(`<script nomodule>` & `<link rel="preload">`)。但是不知何故未能生效，github 上有一些相关 issue
+
+#### 笔记
+
+- 在 `ts/js` 中使用 `assets` 目录下的图片可以通过 `require('@/assets/img/*.png')`(或 import), 将得到输出路径或 base64 字符串, 其他类似(新的文件格式请配置 loader 和增加[ts 定义](src/shims-modules.d.ts))
+- 在 `scss` 中引入 `css` ([@import](https://www.sass.hk/docs)) 有两种方式
+  1. 【推荐】不带文件后缀, css 文件内容会被合并到当前文件。比如: `@import '~normalize.css';`
+  1. 带文件后缀, 会处理成 css 的[@import](https://developer.mozilla.org/en-US/docs/Web/CSS/@import)。比如: `@import '~normalize.css/normalize.css';`
+
+#### 其他
+
+- 期待 [vue3.0](https://github.com/vuejs/vue/projects/6) & [vue cli 4.0](https://github.com/vuejs/vue-cli/projects/7) 正式版 & [webpack 5.0](https://github.com/webpack/webpack/projects/5) [正式版](https://github.com/webpack/changelog-v5/blob/master/README.md)
+- [#4357](https://github.com/vuejs/vue-cli/issues/4357)
+>>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0

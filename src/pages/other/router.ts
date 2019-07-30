@@ -2,8 +2,6 @@
  * @Description: 路由管理
  * @Author: 毛瑞
  * @Date: 2019-06-18 15:58:46
- * @LastEditors: 毛瑞
- * @LastEditTime: 2019-07-11 12:09:50
  */
 import Vue from 'vue'
 import Router from 'vue-router'
@@ -24,7 +22,7 @@ const router = new Router({
       path: `/${ROUTER.home.name}`,
       name: ROUTER.home.name,
       component: getAsync(() =>
-        import(/* webpackChunkName: "oHome" */ './views/Home.vue')
+        import(/* webpackChunkName: "oHome" */ './views/Home')
       ),
     },
     {
@@ -34,7 +32,7 @@ const router = new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: getAsync(() =>
-        import(/* webpackChunkName: "oAbout" */ './views/About.vue')
+        import(/* webpackChunkName: "oAbout" */ './views/About')
       ),
     },
 
