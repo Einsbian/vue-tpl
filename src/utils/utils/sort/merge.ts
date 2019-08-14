@@ -98,6 +98,7 @@ function merge(left: number, middle: number, right: number): void {
 }
 /** 归并排序(稳定 迭代非递归)
  * @test true
+ *
  * @param {Array} array 待排序数组
  * @param {Compare} compare 数值比较方法
  * @param {Number} start 数组起始索引（含）
@@ -126,7 +127,6 @@ function mergeSort(
     let size: number = 1 // 子数组的大小 【那么2/4/8...归并就是最高效的了】
     do {
       left = start
-      // tslint:disable-next-line: no-conditional-assignment
       while ((middle = left + size - 1) < end) {
         // 【并不能减少耗时，哪怕只是二者交换，又是为啥?】
         // if (right - left < CUTOFF) {

@@ -1,6 +1,12 @@
 # vue-tpl
 
+<<<<<<< HEAD
 vue + vuex + vue router + TypeScript(或 JavaScript) 脚手架
+=======
+vue + vuex + vue router + TypeScript(支持 JavaScript) 脚手架
+
+[更新日志](CHANGELOG.md)
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
 - [命令参考](#命令参考)
   - [安装项目](#安装项目)
@@ -16,12 +22,15 @@ vue + vuex + vue router + TypeScript(或 JavaScript) 脚手架
   - [风格建议](#风格建议)
   - [其他建议](#其他建议)
   - [优化](#优化)
+    - [web 页面](#web%20页面)
+    - [工程](#工程)
   - [IDE](#ide)
 - [部署（nginx）](#部署nginx)
 - [备忘](#备忘)
   - [文档](#文档)
-  - [问题及思考](#问题及思考)
+    - [数据可视化](#数据可视化)
   - [笔记](#笔记)
+  - [问题及思考](#问题及思考)
   - [其他](#其他)
 
 ## 命令参考
@@ -65,8 +74,13 @@ yarn run dev
 ### 构建项目（生成部署文件）
 
 ```
+<<<<<<< HEAD
 yarn run build
 ```
+=======
+
+同时会生成[fileName.map](scripts/fileName.map)记录 文件名/chunk 名映射 (公共代码抽到`v.`开头的文件里了)
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
 ### 代码风格检查和修正（提交 Git 时会自动执行）
 
@@ -138,10 +152,11 @@ yarn run test:unit
 
    1. 遍历 public 下的 html 模板文件，得到一个 html 模板
    2. 依次对 src 目录及 src/pages 进行如下查找:
-      1. 若该目录下存在与该 html 模板名同名的 ts/tsx/js/jsx 文件则设置为入口，未找到或已占用则 2
-      2. 依次检查下列文件名: main/index/entry/app/page 设置为入口，未找到或已占用则 3
-      3. 在该目录下与 html 模板同名的目录下按照 1、2 的规则继续查找，最终仍未找到或已占用则不设置入口
+      1. 若该目录下存在与该 html 模板名同名的 ts/tsx/js/jsx 文件则设置为入口，未找到或已占用则**↓**
+      2. 依次检查下列文件名: main/index/entry/app/page 设置为入口，未找到或已占用则**↓**
+      3. 在该目录下与 html 模板同名的目录下按照**上述**规则继续查找，最终仍未找到或已占用则不设置入口
 
+<<<<<<< HEAD
    建议：单页入口直接放 src 目录下，多页时入口分别放在 pages 目录下与 html 模板同名的文件夹下
 
 6. 已有目录别名如下:
@@ -152,18 +167,55 @@ yarn run test:unit
    - @{entry}Com -> 页面入口文件所在目录下的 components 目录，如: @indexCom
 
 7. 除了以下样式:
+=======
+   建议：**单页入口直接放 src 目录下，多页时入口分别放在 pages 目录下与 html 模板同名的文件夹下**
+
+2. <a id="别名"></a>已有目录别名如下:
+
+   - `@` -> `src`
+   - `@com` -> `src/components`
+   - `@{entry}` -> 页面入口文件所在目录，如: `@index`
+   - `@{entry}Com` -> 页面入口文件所在目录下的 `components` 目录，如: `@indexCom`
+
+   **Tips**: 在 `scss` 中使用 `~` 解析 `别名`/`依赖包` 对应目录。 示例:
+
+   ```html
+   <!-- SomeView.vue -->
+   <template>
+     <div :class="$style.wrapper">
+       <!-- 视为ts/js -->
+       <img src="@/assets/logo.png" />
+     </div>
+   </template>
+
+   <style lang="scss">
+     /* => node_modules/normalize.css/normalize.css */
+     @import '~normalize.css';
+   </style>
+
+   <style lang="scss" module>
+     .wrapper {
+       background: url(~@index/assets/bg.png);
+     }
+   </style>
+   ```
+
+3. 输出目录为 `dist`, 包含 js/css/img/font/media 等文件夹
+4. 所有 `config` 目录下的内容都会被打包到同一个文件`conf.*.js`(需要保留的注释请使用: `/*! 注释内容 */`)，用于支持直接修改配置而不必重新打包代码
+5. 除了以下样式可以使用全局:
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
    - 浏览器默认样式重置
-   - Transition 动画样式
+   - `Transition` 动画样式
    - 字体图标样式
-   - 公共组件样式(使用[BEM ](https://en.bem.info)约定[参考链接](https://www.ibm.com/developerworks/cn/web/1512_chengfu_bem/))
-   - 少量全局样式【慎用】
+   - 公共组件默认样式(使支持换肤，使用[BEM](https://en.bem.info)约定[参考链接](https://www.ibm.com/developerworks/cn/web/1512_chengfu_bem/))
 
-   均应使用 [CSSModule](https://vue-loader-v14.vuejs.org/zh-cn/features/css-modules.html)，以更好的组件化和复用、打包样式
+   均应使用 [CSSModule](https://vue-loader-v14.vuejs.org/zh-cn/features/css-modules.html)，以更好的模块化和复用、打包样式
 
 > **提示和建议**
 
 - 新建目录时尽量复用上述列出的目录名，保证结构清晰的情况下减少目录层级
+<<<<<<< HEAD
 - 目录及文件命名：<br>
 <<<<<<< HEAD
   文件夹及其它文件(js/scss/图片等)使用 `camelCase` (即：首字母小写驼峰 = lowerCamelCase)；<br>
@@ -190,6 +242,15 @@ yarn run test:unit
   **文件夹及其它文件**(js/scss/图片等)使用 `camelCase` (即：首字母小写驼峰 = lowerCamelCase)；<br>
   **vue 单文件组件**(含[tsx](https://github.com/wonderful-panda/vue-tsx-support)/`jsx`/`functional.(ts|js)`)使用 `PascalCase` ( 即：首字母大写驼峰 = CamelCase = UpperCamelCase)<br><br>
   例外情况:
+=======
+- 目录及文件命名:
+
+  **文件夹及其它文件**(js/scss/图片等)使用 `camelCase` (即：首字母小写驼峰 = lowerCamelCase)
+
+  **vue 单文件组件**(含[tsx](https://github.com/wonderful-panda/vue-tsx-support)/`jsx`/`functional.(ts|js)`)使用 `PascalCase` ( 即：首字母大写驼峰 = CamelCase = UpperCamelCase)
+
+  例外情况(方便重构):
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
   - 组件包含不可复用的子组件时，应视为一个组件, 创建**文件夹容器**，比如:
 
@@ -240,6 +301,7 @@ yarn run test:unit
 （.vscode 文件夹为 VSCode 的工作区设置，只在本项目生效，已包含 Prettier 插件相关风格设置）
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 > 另请参考: [vue 风格指南](https://cn.vuejs.org/v2/style-guide/) 强烈推荐(B)及以上和 TypeScript [tslint.json](https://palantir.github.io/tslint/rules/)
 
 > 提交代码请使用标识: Add/Del/Fix/Mod 等
@@ -249,6 +311,12 @@ yarn run test:unit
 =======
 - 另请参考: [vue 风格指南](https://cn.vuejs.org/v2/style-guide/) **推荐(C)及以上**和 TypeScript [tslint.json](https://palantir.github.io/tslint/rules/)
 - 在 jsx/tsx 中使用全局注册的组件时可以使用`kebab-case`, 否则会在控制台输出错误 ┐(：´ ゞ｀)┌
+=======
+  （.vscode 文件夹为 VSCode 的工作区设置，只在本项目生效，已包含 Prettier、ESLint 插件相关设置）
+
+- 另请参考: [vue 风格指南](https://cn.vuejs.org/v2/style-guide/) **推荐(C)及以上**和 [tslint.json](tslint.json)
+- 在`jsx/tsx`中使用全局注册的组件时可以使用`kebab-case`, 否则会在控制台输出错误 ┐(：´ ゞ｀)┌
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
   ```TypeScript
   import { CreateElement } from 'vue'
@@ -267,26 +335,74 @@ yarn run test:unit
   }
   ```
 
-- 引用 vue 单文件组件不要加文件扩展名，有利于后期重构代码
-- 先定义再`export`(IDE 提示更友好), 并且`export`语句放到最后(方便查看代码)
-- **不要用全局样式覆盖全局样式**, 应使用 `CSSModule` 并使优先级相等(注意顺序，包括同步/异步)或更高:
+- 引用 vue 单文件组件**不要加文件扩展名**，有利于重构代码
+- 先定义再`export`(IDE 提示更友好), 并且`export`语句放到最后
+- <a id="全局scss"></a>**全局 sccs** _(包含<a href="#别名">各别名</a>下[.env](.env) `GLOBAL_SCSS`变量指定的文件)_ 中不要出现具体样式, 也不要有[`:export{}`](https://github.com/css-modules/icss#export); 为保证`ts/js`中引入时 scss 变量注入正确 _(从近到远依次注入所属别名目录下的指定文件)_, 应在适合的 scss 文件中引入目标样式源码:
+
   ```scss
-  // bad →_→
-  :global {
-    .content .title.active {
-      color: $colorHighlight;
-    }
-  }
-  // good ｂ(￣▽￣)ｄ
-  .content {
-    :global {
-      .title.active {
-        color: $colorHighlight;
-      }
+  // el.scss
+  @import '~element-ui/packages/theme-chalk/src/button.scss';
+  ```
+
+  ```html
+  <template>
+    <ElButton>默认按钮</ElButton>
+  </template>
+
+  <script lang="ts">
+    import { Component, Vue } from 'vue-property-decorator'
+
+    import { Button as ElButton } from 'element-ui'
+    import './el.scss'
+
+    @Component({
+      components: { ElButton },
+    })
+    export default class extends Vue {}
+  </script>
+  <!-- 也可以在这儿引用
+  <style lang="scss">
+    @import '~element-ui/packages/theme-chalk/src/button.scss';
+  </style> -->
+  ```
+
+  或
+
+  ```TypeScript
+  import { CreateElement } from 'vue'
+  import { Component, Vue } from 'vue-property-decorator'
+
+  import { Button as ElButton } from 'element-ui'
+  import './el.scss'
+
+  @Component
+  export default class extends Vue {
+    private render(h: CreateElement) {
+      return <ElButton>默认按钮</ElButton>
     }
   }
   ```
-- 尽量使用项目代码模板，现有模板有(vsCode 输入左侧字符, [其他 IDE](.vscode/vue.code-snippets)):
+
+- **不要用全局样式覆盖全局样式**, 应使用 `CSSModule` 并使[优先级](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Specificity)相等(注意顺序，包括同步/异步)或更高:
+
+  ```scss
+  // bad →_→
+  :global(.content .title.active) {
+    color: $colorHighlight;
+  }
+  // good ｂ(￣▽￣)ｄ
+  .content :global(.title.active) {
+    color: $colorHighlight;
+  }
+  // good ｂ(￣▽￣)ｄ
+  .content .title {
+    &:global(.active) {
+      color: $colorHighlight;
+    }
+  }
+  ```
+
+- 尽量使用项目代码模板，现有模板有(VSCode 输入左侧字符, [其他 IDE](.vscode/vue.code-snippets)):
   - `ts`: `TypeScript` & `CSS Module`, vue 单文件组件中使用
   - `vue`: `TypeScript` & `CSS Module`, `tsx` 文件中使用
   - `js`: `JavaScript` & `CSS Module`, vue 单文件组件中使用
@@ -295,16 +411,24 @@ yarn run test:unit
 
 ### 其他建议
 
+<<<<<<< HEAD
 - 全局 sccs 中(见 .env 文件`GLOBAL_SCSS=/scss/var.scss`)不要出现具体样式, 也不要有[`:export{}`](https://github.com/css-modules/icss#export)
 
 >>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
+=======
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 - 规范优雅正确适当的各种**注释**，比如方法注释及必要的变量注释：
 
   ```TypeScript
   // math.ts
+<<<<<<< HEAD
   /** 点
   * @summary 描述一个点的信息
   */
+=======
+  /** 二维点
+   */
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
   interface IPoint {
     x: number
     y: number
@@ -312,7 +436,13 @@ yarn run test:unit
     */
     desc?: string
   }
+<<<<<<< HEAD
   const ANGLE_RADIAN: number = Math.PI / 180 // 角度转弧度常量
+=======
+  /** 角度转弧度常量
+   */
+  const ANGLE_RADIAN = Math.PI / 180
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
   /** 计算圆上的点
   *
   * @param {IPoint} center 圆心
@@ -322,7 +452,11 @@ yarn run test:unit
   * @returns {IPoint} 圆上的点坐标
   */
   function getPointOnCircle(center: IPoint, radius: number, angle: number): IPoint {
+<<<<<<< HEAD
     const redian: number = angle * ANGLE_RADIAN // 角度转弧度
+=======
+    const redian = angle * ANGLE_RADIAN // 弧度
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
     return {
       x: center.x + radius * Math.sin(redian),
@@ -350,7 +484,7 @@ yarn run test:unit
     // 说明
   }
 
-  // 使用枚举或字典时可视情况不写注释
+  // 使用枚举或字典时可不写注释
   switch(expression) {
     case value1:
       // 说明
@@ -361,10 +495,11 @@ yarn run test:unit
       ...
       break
     default:
-      // 说明
+      ...
   }
   ```
 
+<<<<<<< HEAD
 - [异步 chunk](https://webpack.docschina.org/api/module-methods) 使用入口层级命名(避免重名合并)，层级使用小写字母, chunk 名首字母大写，比如: index 页面下的 home 视图命名为 index_Home, 其下的用户视图命名为 index_home_My, 用户基础信息命名为 index_home_my_Baseinfo 。为避免文件名太长，每个层级可以用一到两个字母进行缩写: iHome, ihMy, ihmBaseInfo, 对异步 chunk 进行命名可以方便排查问题。
 - libs 下库文件需要按需加载的，应提供引入方法（只会成功加载一次），比如:
 
@@ -388,17 +523,64 @@ yarn run test:unit
               return import(
                 /* webpackChunkName: "*lsPlugin2" */ './plugins/plugin2.min'
               )
+=======
+- [异步 chunk](https://webpack.docschina.org/api/module-methods) 使用入口层级命名(方便排查问题和碎文件合并)，比如: index 页面下的 home 视图命名为 `index_home`, 其下的用户视图命名为 `index_home_my`, 用户基础信息命名为 `index_home_my_baseinfo` 。为避免文件名太长，每个层级可以缩写: `iHome`, `ihMy`, `ihmBaseInfo`。
+- libs 下的库文件需要按需加载的，应提供引入方法（只会成功加载一次），比如(模块化, 全局的类似):
+
+  ```TypeScript
+  // src/libs/somelib/index.ts
+  /** 异步引入somelib(模块化)及其插件
+  * @param {Array<String>} plugins 需要加载的somelib插件名列表:
+  *
+  *   plugin1: 插件1
+  *
+  *   plugin2: 插件2
+  *
+  *   ...
+  *
+  * @returns {Promise<Array<Module>>} 模块
+  */
+  function get(plugins: string[] = []): Promise<any> {
+    let somelib: any
+    return import(/* webpackChunkName: "lSomelib" */ 'somelib')
+      .then((module: any) => {
+        somelib = module.default
+        return Promise.all(plugins.map((plugin: string) => {
+          switch (plugin) {
+            case 'plugin1':
+              return import(/* webpackChunkName: "lsPlugins" */ 'somelib.plugin1')
+            case 'plugin2':
+              return import(/* webpackChunkName: "lsPlugins" */ 'somelib.plugin2')
+            // 上面两个插件合并到一个chunk里
+            // ...
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
           }
-        })
-      )
-    )
+        }) as Array<Promise<any>>)
+      })
+      // 注册插件(略)，返回somelib
+      .then((modules: Array<Promise<any>>) => somelib)
   }
 
   export default get
+
+  // src/pages/index/components/Foo.vue
+  // ...
+  // <script lang="ts"> ...
+  import get from '@/libs/somelib'
+
+  @Component
+  export default class extends Vue {
+    /// methods (private/public) ///
+    private refreshPanel() {
+      get(['plugin2']).then((somelib: any) => somelib.init(this.$refs.panel))
+    }
+  }
+  // ...
   ```
 
 ### 优化
 
+<<<<<<< HEAD
 请参照 `vue.config.js`文件中*chainWebpack*的注释进行配置
 
 - 减小图片大小(比如背景图片等)
@@ -407,13 +589,27 @@ yarn run test:unit
 - 视情况对 css 文件进行合并(比如按入口等，不设置则按 chunk)
 =======
 - 对多个 js chunk 共同依赖的模块进行单独提取(cacheGroups)
+=======
+#### web 页面
+
+请参照 [vue.config.js](vue.config.js) 文件中 _chainWebpack_ 的注释进行配置
+
+- 减小图片大小(比如背景图片等)
+- 对多个 js chunk 共同依赖的模块进行缓存/单独提取(cacheGroups)
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 - 视情况对 css 文件进行合并(比如按入口等，不设置则按 chunk)【webpack 5 支持设置 css chunk 的 minSize/maxSize 啦】
 >>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
 - [现代模式](https://cli.vuejs.org/zh/guide/browser-compatibility.html#现代模式)
 
+<<<<<<< HEAD
 ### 日志
 
 版本迭代日志 [releaseLog](releaseLog.md)
+=======
+#### 工程
+
+因为模块加载，所以不能预编译依赖库；依赖库的 scss 文件倒是可以用下 cache-loader；暂未找到更多可优化内容(run scripts 确实慢 ┐(：´ ゞ｀)┌)
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
 ### IDE
 
@@ -432,8 +628,11 @@ yarn run test:unit
 - ESLint & TSLint: 代码检查
 - Prettier - Code formatter: 代码格式化
 - GitLens: Git 工具
+<<<<<<< HEAD
 - EditorConfig for VS Code: IDE 设置
 >>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
+=======
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
 推荐工具： `@vue/cli`: v3.X，全局安装时可使用 `vue ui` 命令启动图形化界面管理项目(运行 inspect 任务查看 webpack 配置)[文档链接](https://cli.vuejs.org/zh/guide)
 
@@ -447,7 +646,7 @@ yarn run test:unit
 4. 开启 `gzip` 压缩，并重用已有 gz 文件 `gzip_static on;`
 5. 缓存静态资源(html 可减小缓存时间)
 
-配置示例:
+配置示例(`{value}` 换成对应值):
 
 ```
 server {
@@ -469,7 +668,7 @@ server {
 
   # 部署在根目录 直接访问域名
   location / {
-    # rewrite ^/app/(?:path|path-alias)/(.*)$ /app/$1 last; # 兼容某些路径
+    # rewrite ^/app/(?:path|path-alias)/(.*)$ /app/$1 last; # 兼容某些路由
     proxy_set_header access_token ''; # 添加允许的请求头
 
     # 设置静态资源缓存(文件名带内容哈希)
@@ -483,7 +682,7 @@ server {
     }
 
     index index.html;
-    try_files $uri $uri/  /; # 使支持history路由
+    try_files $uri $uri.html $uri/  /; # 使支持history路由
     root {path};
   }
 
@@ -492,7 +691,7 @@ server {
     # 略
 
     index index.html;
-    try_files $uri $uri/ /app/;
+    try_files $uri $uri.html $uri/ /app/;
     alias {path};
   }
 
@@ -506,8 +705,9 @@ server {
 }
 ```
 
-### 备忘
+## 备忘
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 - 在 js 中使用 `assets` 目录下的图片可以通过 `require('@/assets/img/*.png')`, 将得到输出路径或 base64 字符串
 
@@ -518,6 +718,9 @@ server {
 - 现代模式: (只针对 js 文件)该模式优点是若浏览器支持 ES2015 则加载 ES2015 代码(体积更小执行更快，&lt;script type="module"&gt; & &lt;link rel="modulepreload"&gt;)；不支持则加载 Babel 转码后的代码(&lt;script nomodule&gt; & &lt;link rel="preload"&gt;)。但是不知何故未能生效，github 上有一些相关 issue。
 =======
 #### 文档
+=======
+### 文档
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4
 
 - [scss](https://www.sass.hk/docs)
 - [vue](https://cn.vuejs.org)
@@ -533,20 +736,40 @@ server {
 - [crypto-js](http://cryptojs.altervista.org)
 - [jsencrypt](http://travistidwell.com/jsencrypt)
 
-#### 问题及思考
+#### 图形库
 
-- **Vue 异步组件加载失败重试**: 暂时无解，因各层级（RouterView functional 等）的分发，很难统一实现加载失败后可点击重新下载，最好还是 Vue 对异步组件提供支持[#9788](https://github.com/vuejs/vue/issues/9788)
-- 现代模式(只针对 js 文件): 该模式优点是若浏览器支持 ES2015 则加载 ES2015 代码(体积更小执行更快，`<script type="module">` & `<link rel="modulepreload">`)；不支持则加载 Babel 转码后的代码(`<script nomodule>` & `<link rel="preload">`)。但是不知何故未能生效，github 上有一些相关 issue
+2D
 
-#### 笔记
+- [ECharts](https://echarts.baidu.com/api.html#echarts)
+- [zrender](https://ecomfe.github.io/zrender-doc/public/api.html)
+- [d3](https://github.com/d3/d3/wiki)
+- [zdog](https://zzz.dog)
+- [pixi.js](https://www.pixijs.com) _(WebGL2/WebGL)_
+
+3D
+
+- [three.js](https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene) _(WebGL2/WebGL)_
+- [luma.gl](https://luma.gl/#/documentation/api-reference/api-overview/api-structure) _(WebGL2/WebGL)_
+
+### 笔记
 
 - 在 `ts/js` 中使用 `assets` 目录下的图片可以通过 `require('@/assets/img/*.png')`(或 import), 将得到输出路径或 base64 字符串, 其他类似(新的文件格式请配置 loader 和增加[ts 定义](src/shims-modules.d.ts))
 - 在 `scss` 中引入 `css` ([@import](https://www.sass.hk/docs)) 有两种方式
   1. 【推荐】不带文件后缀, css 文件内容会被合并到当前文件。比如: `@import '~normalize.css';`
   1. 带文件后缀, 会处理成 css 的[@import](https://developer.mozilla.org/en-US/docs/Web/CSS/@import)。比如: `@import '~normalize.css/normalize.css';`
 
-#### 其他
+### 问题及思考
+
+- Vue 异步组件加载失败重试: 最好还是 Vue 对异步组件提供支持[#9788](https://github.com/vuejs/vue/issues/9788)
+- 现代模式(只针对 js 文件): 该模式优点是若浏览器支持 ES2015 则加载 ES2015 代码(体积更小执行更快，`<script type="module">` & `<link rel="modulepreload">`)；不支持则加载 Babel 转码后的代码(`<script nomodule>` & `<link rel="preload">`)。但是不知何故未能生效，github 上有一些相关 issue
+
+### 其他
 
 - 期待 [vue3.0](https://github.com/vuejs/vue/projects/6) & [vue cli 4.0](https://github.com/vuejs/vue-cli/projects/7) 正式版 & [webpack 5.0](https://github.com/webpack/webpack/projects/5) [正式版](https://github.com/webpack/changelog-v5/blob/master/README.md)
+<<<<<<< HEAD
 - [#4357](https://github.com/vuejs/vue-cli/issues/4357)
 >>>>>>> aad1adfb44a1afc55926cf87b02c24e322dd09c0
+=======
+- [#149](https://github.com/webpack/loader-utils/issues/149): 开发环境 class 名加个 emoji 更好区分是否全局样式
+- [#714](https://github.com/webpack-contrib/sass-loader/issues/714): 可追踪引用，使在 js 中引用 scss 时可正确<a href="#全局scss">注入 scss 变量</a>
+>>>>>>> 67a5adc6adac311e4e7723b2aab38af41baafcd4

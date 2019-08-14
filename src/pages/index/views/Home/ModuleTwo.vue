@@ -5,11 +5,19 @@
  -->
 <template>
   <div :class="$style.wrapper">
-    这里是模二
+    <MoveCircle :class="$style.circle" />
+    <ChartRose :data="data" />
   </div>
 </template>
 
 <script lang="ts">
+import { get } from '@/utils/ajax'
+import API from '@index/api'
+import CONFIG from '@index/config'
+import ChartRose from '@indexCom/charts/Rose'
+import MoveCircle from '@indexCom/visual/Circle'
+
+import { EChartOption } from 'echarts'
 // see: https://github.com/kaorun343/vue-property-decorator
 import { Component, Vue } from 'vue-property-decorator'
 
@@ -18,22 +26,67 @@ import { Component, Vue } from 'vue-property-decorator'
 // function utils() {} // 函数(无副作用)
 
 /// name,components,directives,filters,extends,mixins ///
-@Component
+@Component({
+  components: { ChartRose, MoveCircle },
+})
 export default class extends Vue {
   /// model (@Model) ///
   /// props (@Prop) ///
   /// data (private name: string = '响应式属性' // 除了undefined都会响应式) ///
+  private data: EChartOption.SeriesPie | null = null
   /// private instance attributes (private name?: string // 非响应式属性) ///
   /// computed (get name() { return this.name } set name()... ///
   /// watch (@Watch) ///
   /// LifeCycle (beforeCreate/created/.../destroyed) ///
+  private created() {
+    this.get()
+  }
   /// methods (private/public) ///
+  private get() {
+    get(API.chartPie)
+      .then((data: any) => {
+        data &&
+          data.success &&
+          (this.data = data.data as EChartOption.SeriesPie)
+      })
+      .catch(console.error)
+      .finally(() => {
+        // 假数据
+        this.data ||
+          (this.data = {
+            name: '系列一',
+            data: [
+              { name: '甲', value: 1 },
+              { name: '乙', value: 2 },
+              { name: '丙', value: 3 },
+              { name: '丁', value: 4 },
+              { name: '戊', value: 5 },
+            ],
+          })
+        setTimeout(() => {
+          this.get()
+        }, CONFIG.ajax)
+      })
+  }
   /// render ///
 }
 </script>
 
 <style lang="scss" module>
 .wrapper {
-  padding: 10px
+  width: 100%;
+  height: 100%;
+  padding: 10% 0;
+  box-sizing: border-box;
+
+  > div {
+    width: 100%;
+    height: 100%;
+  }
+}
+.circle {
+  top: 0;
+  left: 0;
+  position: absolute;
 }
 </style>

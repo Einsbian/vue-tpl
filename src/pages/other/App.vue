@@ -1,6 +1,11 @@
+<!--
+ * @Description: 页面布局
+ * @Author: 毛瑞
+ * @Date: 2019-08-08 17:48:25
+ -->
 <template>
-  <body id="app">
-    <div id="nav">
+  <body :class="$style.wrapper">
+    <div :class="$style.nav">
       <RouterLink to="/">
         Home
       </RouterLink>|
@@ -135,24 +140,22 @@
   </body>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+<style lang="scss" module>
+.wrapper {
   text-align: center;
-  color: #2c3e50;
+  color: $colorText;
 }
-#nav {
+
+.nav {
   padding: 30px;
+
   a {
     font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+    color: $colorText;
+
+    &:global(.router-link-exact-active) {
+      color: $colorHighlight;
     }
   }
 }
-
-@import '@/scss/reset.scss';
 </style>

@@ -11,8 +11,9 @@ const path = require('path')
 const environment = process.env // 环境变量
 const isProd = environment.NODE_ENV === 'production' // 是否生产环境
 
-const pages = require('./scripts/getPages')(isProd) // 自动检测并返回页面入口设置
+const pages = require('./scripts/pages')(isProd) // 自动检测并返回页面入口设置
 
+let ALIAS = {} // 别名字典
 // 输出图形
 console.log(
   require('./scripts/figure')[
@@ -29,13 +30,15 @@ module.exports = {
   lintOnSave: !isProd, // 保存时检查代码
   productionSourceMap: false, // 生产环境不要sourceMap
   // babel转码, 默认不转依赖包
-  transpileDependencies: ['vuex-module-decorators'],
+  transpileDependencies: isProd
+    ? ['vuex-module-decorators', 'three']
+    : undefined,
 
   /// 【配置页面入口】https://cli.vuejs.org/zh/config/#pages ///
   pages,
 
   /// 【配置样式】 ///
-  css: require('./scripts/css')(isProd, pages, environment.GLOBAL_SCSS),
+  css: require('./scripts/css')(isProd, ALIAS, environment.GLOBAL_SCSS),
 
   /// 【开发服务器配置】 ///
   devServer: require('./scripts/devServer')(environment),
@@ -50,7 +53,7 @@ module.exports = {
     //   .end()
 
     /// 【设置目录别名 已有: @ => src 】 ///
-    require('./scripts/alias')(pages, config, path.join(process.cwd(), '/'))
+    require('./scripts/alias')(pages, config, ALIAS)
 
     /// 出口 ///
     // config.output.hashDigest('base64')
@@ -83,7 +86,7 @@ module.exports = {
 
     /// 【优化(optimization)】 ///
     // https://webpack.docschina.org/configuration/optimization 使用默认就好
-    // config.optimization.mangleWasmImports(true) // WebAssembly短名【暂不支持短方法】
+    // config.optimization.mangleWasmImports(true) // WebAssembly短名
     // config.optimization.runtimeChunk('single') // 所有chunk共享一个运行时文件
 
     /// 【代码分割(optimization.splitChunks 不能config.merge({}))】 ///
@@ -92,18 +95,16 @@ module.exports = {
       chunks: 'all', // 包含所有类型包（同步&异步 用insert-preload补齐依赖）
 
       // 分割优先级: maxInitialRequest/maxAsyncRequests < maxSize < minSize
-      // 最小分包大小 122k, 183k(122*1.5)
-      minSize: 124928,
+      minSize: 134144, // 最小分包大小
       // webpack 5
       // minSize: {
-      //   javascript: 124928,
-      //   style: 187392,
+      //   javascript: 134144, // 131k
+      //   style: 216064, // 211k
       // },
-      // 最大分包大小 244k, 366k(244*1.5) （超过后尝试分出大于minSize的包）
-      maxSize: 249856,
+      maxSize: 320512, // 最大分包大小（超过后尝试分出大于minSize的包）
       // maxSize: {
-      //   javascript: 249856,
-      //   style: 374784,
+      //   javascript: 320512, // 313k
+      //   style: 398336, // 389k
       // },
       // 超过maxSize分割命名 true:hash(长度8，不造哪儿改)[默认] false:路径
       // hidePathInfo: true, // 也没个文件名配置啊...
@@ -112,7 +113,7 @@ module.exports = {
       maxInitialRequests: 3, // 最大初始化时异步代码请求数
 
       automaticNameDelimiter: '.', // 超过大小, 分包时文件名分隔符
-      // automaticNameMaxLength: 15, // 分包文件名自动命名最大长度【文档有写，但是报错unknown】
+      // automaticNameMaxLength: 15, // 分包文件名自动命名最大长度
       name: isProd && require('./scripts/rename'),
       cacheGroups: {
         /// 【 js 】 ///
@@ -178,6 +179,38 @@ module.exports = {
           priority: 66,
           reuseExistingChunk: true,
           test: /[\\/]node_modules[\\/]echarts[\\/]/,
+        },
+        // zdog
+        zdg: {
+          name: 'zdg',
+          chunks: 'all',
+          priority: 66,
+          reuseExistingChunk: true,
+          test: /[\\/]node_modules[\\/]zdog[\\/]/,
+        },
+        // pixi.js
+        pix: {
+          name: 'pix',
+          chunks: 'all',
+          priority: 66,
+          reuseExistingChunk: true,
+          test: /[\\/]node_modules[\\/]pixi.js[\\/]/,
+        },
+        // three.js
+        thr: {
+          name: 'pix',
+          chunks: 'all',
+          priority: 66,
+          reuseExistingChunk: true,
+          test: /[\\/]node_modules[\\/]three[\\/]/,
+        },
+        // luma.gl
+        lum: {
+          name: 'lum',
+          chunks: 'all',
+          priority: 66,
+          reuseExistingChunk: true,
+          test: /[\\/]node_modules[\\/]luma.gl[\\/]/,
         },
 
         /// 【 css 】(多数情况下不需要，webpack 5可以去掉) ///

@@ -4,20 +4,26 @@
  * @Date: 2019-07-04 14:38:59
  */
 
-/** 获取目标元素到页面顶部的绝对定位
+/** 获取目标元素到页面左上角的绝对定位
  * @param {Dom} dom dom对象
+ * @param {Boolean} flag undefined: 返回{top,left}; true: 返回top; false: 返回left
  *
- * @returns {Number} 当前元素到顶部距离（px）
+ * @returns {Number|{ top: number; left: number } } 见flag
  */
-function getOffsetTop(dom: any): number {
+function getOffset(
+  dom: any,
+  flag?: boolean
+): number | { top: number; left: number } {
   let top: number = 0
+  let left: number = 0
 
   do {
-    top += dom.offsetTop
+    flag || (left += dom.offsetLeft)
+    flag === false || (top += dom.offsetTop)
     dom = dom.offsetParent
   } while (dom)
 
-  return top
+  return flag === undefined ? { top, left } : flag ? top : left
 }
 
 /** html标签信息
@@ -122,7 +128,6 @@ function getInfoByHtml(html: string): HtmlInfo {
   let attributes: string // 标签属性集合字符串
   // let index; // 配置开始索引
   let info: ITag // 提取结果
-  // tslint:disable-next-line: no-conditional-assignment
   while ((result = REG_ATTS.exec(html))) {
     // match = result[0]
     tagName = result[1]
@@ -136,7 +141,6 @@ function getInfoByHtml(html: string): HtmlInfo {
 
     // 提取属性 分组：属性值 属性名
     if (attributes) {
-      // tslint:disable-next-line: no-conditional-assignment
       while ((result = REG_ATT.exec(attributes))) {
         // 空属性等于自身,比如 disabled、checked等
         // 呃，某些自定义的空属性也这么搞吧...
@@ -204,4 +208,4 @@ function escapeHTML(html: string): string {
   return html.replace(REG_TAGS, REPLACE_TAG)
 }
 
-export { getOffsetTop, getInfoByHtml, escapeHTML, HtmlInfo }
+export { getOffset, getInfoByHtml, escapeHTML, HtmlInfo }

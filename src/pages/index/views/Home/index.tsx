@@ -43,63 +43,62 @@ export default class extends Vue {
         <PageHeader />
         {/* 内容 */}
         <div class={$style.content}>
-          {/* 模块一 */}
           <ModuleContainer class={$style.one}>
             <template slot='icon'>
               <i class='i-check-circle' />
             </template>
-            <template slot='title'>模块一</template>
-            <template slot='unit'>单位: GB</template>
+            <template slot='title'>ECharts</template>
+            <template slot='unit'>(模块)</template>
 
             <ModuleOne />
           </ModuleContainer>
-          {/* 模块二 */}
+
           <ModuleContainer class={$style.two}>
             <template slot='icon'>
               <i class='i-CI' />
             </template>
-            <template slot='title'>模块二</template>
-            <template slot='unit'>单位: %</template>
+            <template slot='title'>ECharts + ZRender</template>
+            <template slot='unit'>(模块)</template>
 
             <ModuleTwo />
           </ModuleContainer>
-          {/* 模块三 */}
+
           <ModuleContainer class={$style.three}>
             <template slot='icon'>
               <i class='i-Dollar' />
             </template>
-            <template slot='title'>模块三</template>
-            <template slot='unit'>单位: 件</template>
+            <template slot='title'>three.js</template>
+            <template slot='unit'>(模块)</template>
 
             <ModuleThree />
           </ModuleContainer>
-          {/* 模块四 */}
+
           <ModuleContainer class={$style.four}>
             <template slot='icon'>
               <i class='i-compass' />
             </template>
-            <template slot='title'>模块四</template>
-            <template slot='unit'>单位: 个</template>
+            <template slot='title'>luma.gl</template>
+            <template slot='unit'>(模块)</template>
 
             <ModuleFour />
           </ModuleContainer>
-          {/* 模块五 */}
+
           <ModuleContainer class={$style.five}>
             <template slot='icon'>
               <i class='i-close-circle' />
             </template>
-            <template slot='title'>模块五</template>
-            <template slot='unit'>单位: 条</template>
+            <template slot='title'>d3</template>
+            <template slot='unit'>(模块)</template>
 
             <ModuleFive />
           </ModuleContainer>
-          {/* 模块六 */}
+
           <ModuleContainer class={$style.six}>
             <template slot='icon'>
               <i class='i-frown' />
             </template>
-            <template slot='title'>模块六</template>
-            <template slot='unit'>单位: 人</template>
+            <template slot='title'>zdog + pixi.js(背景)</template>
+            <template slot='unit'>(模块)</template>
 
             <ModuleSix />
           </ModuleContainer>

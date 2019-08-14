@@ -78,6 +78,12 @@ declare module '*.json' {
 //   export = content
 // }
 
+declare module 'zrender/lib/*'
+declare module 'zdog/js/*'
+declare module 'luma.gl'
+declare module 'math.gl'
+declare module '@luma.gl/addons'
+
 /// vue 单文件组件，放最后 ///
 declare module '*' {
   import Vue from 'vue'
