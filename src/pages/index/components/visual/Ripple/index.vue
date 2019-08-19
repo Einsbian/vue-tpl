@@ -1,21 +1,16 @@
 <!--
- * @Description: About视图【仅布局】
+ * @Description: 波浪
  * @Author: 毛瑞
- * @Date: 2019-07-25 10:19:56
+ * @Date: 2019-08-01 14:55:24
  -->
 <template>
-  <div :class="$style.wrapper">
-    这里是About视图
-  </div>
+  <canvas />
 </template>
 
 <script lang="ts">
 // see: https://github.com/kaorun343/vue-property-decorator
 import { Component, Vue } from 'vue-property-decorator'
-
-// const UPPER_CASE:string|number|any[] // 常量
-// const camelCase:any // 单例
-// function utils() {} // 函数(无副作用)
+import Ripple from './ripple'
 
 /// name,components,directives,filters,extends,mixins ///
 @Component
@@ -28,17 +23,9 @@ export default class extends Vue {
   /// watch (@Watch) ///
   /// LifeCycle (beforeCreate/created/.../destroyed) ///
   /// methods (private/public) ///
+  private mounted() {
+    new Ripple().start({ canvas: this.$el })
+  }
   /// render ///
 }
 </script>
-
-<style lang="scss" module>
-.wrapper {
-  padding: 10% 0;
-  margin-top: 30vh;
-  color: $colorText;
-  text-align: center;
-  font-size: $xx-large;
-  background: url(~@index/assets/bg-grid.jpg);
-}
-</style>

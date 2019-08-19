@@ -11,7 +11,8 @@
 // see: https://github.com/kaorun343/vue-property-decorator
 import { Component, Vue } from 'vue-property-decorator'
 
-/// three.js 按需引入 ///
+/* eslint-disable import/no-duplicates */
+/// three.js 按需引入 (摇不动啊, 几乎不能减小尺寸) ///
 import {
   PerspectiveCamera,
   Scene,
@@ -49,12 +50,13 @@ export default class extends Vue {
   /// methods (private/public) ///
   private mounted() {
     const canvas = this.$el as HTMLCanvasElement
-    if (!WEBGL.isWebGL2Available()) {
-      canvas.appendChild(WEBGL.getWebGL2ErrorMessage())
+    if (!WEBGL.isWebGLAvailable()) {
+      canvas.appendChild(WEBGL.getWebGLErrorMessage())
+      return
     }
 
     let camera: PerspectiveCamera
-    let scene
+    let scene: Scene
     let renderer: WebGLRenderer
     let clock: Clock
     let group: Group
@@ -99,9 +101,10 @@ export default class extends Vue {
 
     renderer = new WebGLRenderer({
       canvas,
-      context: canvas.getContext('webgl2', {
-        antialias: false,
-      }) as WebGLRenderingContext,
+      context: canvas.getContext(
+        WEBGL.isWebGL2Available() ? 'webgl2' : 'webgl',
+        { antialias: false }
+      ) as WebGLRenderingContext,
     })
     renderer.autoClear = false
     renderer.setSize(canvas.offsetWidth, canvas.offsetHeight)
