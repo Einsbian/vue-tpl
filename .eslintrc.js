@@ -1,5 +1,5 @@
 /*
- * @Description: 代码风格定义
+ * @Description: ts/js代码风格定义
  * @Author: 毛瑞
  * @Date: 2019-06-18 15:58:46
  */
@@ -17,11 +17,19 @@ module.exports = {
   parserOptions: {
     parser: '@typescript-eslint/parser',
   },
+  overrides: [
+    {
+      files: ['**/__tests__/*.{j,t}s?(x)'],
+      env: {
+        jest: true,
+      },
+    },
+  ],
   rules: {
     /// 开发环境 ///
     ...(process.env.NODE_ENV === 'production' || {
       // 允许console.log、debugger
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
       'no-debugger': 'warn',
     }),
 
@@ -31,7 +39,11 @@ module.exports = {
     'comma-dangle': ['error', 'always-multiline'], // 保留多行末尾逗号
     'space-before-function-paren': ['error', 'never'], // 方法名后不要空格
 
-    /// vue https://eslint.vuejs.org/rules/ ///
+    /// TSLint https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#supported-rules ///
+    '@typescript-eslint/class-name-casing': 'error', // 类名 PascalCase
+    '@typescript-eslint/interface-name-prefix': ['error', 'always'], // 接口I开头
+
+    /// Vue https://eslint.vuejs.org/rules/ ///
     // [1]: 文档有写，但是插件还没实现
     // [2]: 不支持TypeScript
     'vue/component-name-in-template-casing': 'error',
