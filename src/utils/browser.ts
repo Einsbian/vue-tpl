@@ -3,43 +3,52 @@
  * @Author: 毛瑞
  * @Date: 2018-12-29 11:32:52
  */
-const browsers = [
+
+const userAgent = navigator.userAgent.toLowerCase()
+const REG_VERSION = '.([\\d.]+)'
+const BROWSERS = [
   {
-    n: 'msie',
-    N: 'IE',
+    r: '(?:msie|trident.*rv)',
+    n: 'IE',
   },
   {
-    n: 'firefox',
-    N: 'Firefox',
+    r: 'edge',
+    n: 'Edge',
   },
   {
-    n: 'chrome',
-    N: 'Chrome',
+    r: 'chrome',
+    n: 'Chrome',
   },
   {
-    n: 'opera',
-    N: 'Opera',
+    r: 'firefox',
+    n: 'Firefox',
   },
   {
+    r: 'opera',
+    n: 'Opera',
+  },
+  {
+    r: '(?:safari|version)',
     n: 'Safari',
-    r: 'version',
   },
 ]
 
 let type
 let version
 
-const userAgent = window.navigator.userAgent.toLowerCase()
-let tmp
+let temp
 let item
-for (item of browsers) {
-  tmp = new RegExp((item.r || item.n) + '.([\\d.]+)').exec(userAgent)
-  if (tmp) {
-    type = item.N || item.n
-    version = tmp[1]
+for (temp in BROWSERS) {
+  item = BROWSERS[temp]
+  temp = new RegExp(item.r + REG_VERSION).exec(userAgent)
+
+  if (temp) {
+    type = item.n
+    version = temp[1]
     break
   }
 }
+
 // Fix: IE不缓存背景图片
 type === 'IE' && document.execCommand('BackgroundImageCache', false, 'true')
 
